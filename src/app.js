@@ -1,11 +1,10 @@
 const express = require("express");
 const { connectDB } = require("./config/database");
 const User = require("./models/User");
-const bcrypt =require("bcrypt");
+const bcrypt = require("bcrypt");
 const app = express();
 
 app.use(express.json()); // express middleware to parse json data in server coming from client
-
 
 app.post("/signup", async (req, res) => {
   const { firstName, lastName, emailId, password } = req?.body;
@@ -15,18 +14,40 @@ app.post("/signup", async (req, res) => {
     }
 
     //lets hash the password before saving in DB
-    const hashPassword= await bcrypt.hash(password,10);
+    const hashPassword = await bcrypt.hash(password, 10);
 
     //creating dynamic instance of a user model
     const user = new User({
       firstName,
       lastName,
       emailId,
-      password:hashPassword,
+      password: hashPassword,
     });
 
     await user.save();
     res.send(`User added succesfully`);
+  } catch (error) {
+    res.status(400).send(`Error occured:` + error.message);
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { emailId, password } = req?.body;
+  try {
+    if (!emailId) {
+      throw new Error(`Please enter the email address`);
+    }
+    //lets check presence of such user & then check passsword
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error(`User not exist!!`);
+    }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error(`You have entered the wrong password`);
+    } else {
+      res.send(`User logged inSuccesfully`);
+    }
   } catch (error) {
     res.status(400).send(`Error occured:` + error.message);
   }
