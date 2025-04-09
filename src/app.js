@@ -1,27 +1,34 @@
 const express = require("express");
 const { connectDB } = require("./config/database");
 const User = require("./models/User");
+const bcrypt =require("bcrypt");
 const app = express();
 
 app.use(express.json()); // express middleware to parse json data in server coming from client
 
-// app.get("/hey",
-//     (req,res,next)=>{
-//     // res.send(`Hello from the server!! kya haal chaal`);
-//     next();
-// },
-// (req,res)=>{
-//     res.send(`Han bhai bdia na!!`);
-// })
 
 app.post("/signup", async (req, res) => {
-  //creating dynamic instance of a user model
-  const user = new User(req?.body);
+  const { firstName, lastName, emailId, password } = req?.body;
   try {
+    if (!firstName || !lastName) {
+      throw new Error(`Enter the Name please!`);
+    }
+
+    //lets hash the password before saving in DB
+    const hashPassword= await bcrypt.hash(password,10);
+
+    //creating dynamic instance of a user model
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password:hashPassword,
+    });
+
     await user.save();
     res.send(`User added succesfully`);
   } catch (error) {
-    res.status(400).send(`Error svaing the user data` + error);
+    res.status(400).send(`Error occured:` + error.message);
   }
 });
 
