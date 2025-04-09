@@ -4,6 +4,7 @@ const User = require("./models/User");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 const app = express();
 
 app.use(express.json()); // express middleware to parse json data in server coming from client
@@ -48,13 +49,16 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new Error(`You have entered the wrong password`);
-    }
-     else {
+    } else {
       //generate a token
-       const token = await jwt.sign({_id : user._id}, "RAW@WOLF123");
+      const token = await jwt.sign({ _id: user._id }, "RAW@WOLF123", {
+        expiresIn: "1h",
+      });
 
       // attach to a cookie and response back to user
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
       res.send(`User logged inSuccesfully`);
     }
   } catch (error) {
@@ -62,24 +66,16 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async(req,res)=>{
-     try {
-      const cookies = req.cookies;
-      const {token}= cookies;
-      // token validation
-      const decodedToken = await jwt.verify(token,"RAW@WOLF123");
-      const {_id} = decodedToken;
- 
-      const user = await User.findById(_id);
-      res.send(user);
-     } catch (error) {
-      res.status(400).send(`Error occured :` + error.message);
-     }
-     
-})
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    res.send(req?.user);
+  } catch (error) {
+    res.status(400).send(`Error occured :` + error.message);
+  }
+});
 
 // /feed api using get API Call -->to display all the users
-app.get("/feed", async (req, res) => {
+app.get("/feed", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
@@ -89,7 +85,7 @@ app.get("/feed", async (req, res) => {
 });
 
 //  /delete to delete a user
-app.delete("/delete", async (req, res) => {
+app.delete("/delete", userAuth, async (req, res) => {
   const userId = req.body?.userId;
   try {
     // await User.findByIdAndDelete({_id: userId});
@@ -101,7 +97,7 @@ app.delete("/delete", async (req, res) => {
 });
 
 // update a user using patch
-app.patch("/user/:userId", async (req, res) => {
+app.patch("/user/:userId", userAuth, async (req, res) => {
   const userId = req.params?.userId;
   const newData = req.body;
 
