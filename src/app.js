@@ -2,9 +2,12 @@ const express = require("express");
 const { connectDB } = require("./config/database");
 const User = require("./models/User");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const app = express();
 
 app.use(express.json()); // express middleware to parse json data in server coming from client
+app.use(cookieParser()); // to read the cookie from req
 
 app.post("/signup", async (req, res) => {
   const { firstName, lastName, emailId, password } = req?.body;
@@ -45,13 +48,35 @@ app.post("/login", async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new Error(`You have entered the wrong password`);
-    } else {
+    }
+     else {
+      //generate a token
+       const token = await jwt.sign({_id : user._id}, "RAW@WOLF123");
+
+      // attach to a cookie and response back to user
+      res.cookie("token", token);
       res.send(`User logged inSuccesfully`);
     }
   } catch (error) {
     res.status(400).send(`Error occured:` + error.message);
   }
 });
+
+app.get("/profile", async(req,res)=>{
+     try {
+      const cookies = req.cookies;
+      const {token}= cookies;
+      // token validation
+      const decodedToken = await jwt.verify(token,"RAW@WOLF123");
+      const {_id} = decodedToken;
+ 
+      const user = await User.findById(_id);
+      res.send(user);
+     } catch (error) {
+      res.status(400).send(`Error occured :` + error.message);
+     }
+     
+})
 
 // /feed api using get API Call -->to display all the users
 app.get("/feed", async (req, res) => {
