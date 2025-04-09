@@ -1,47 +1,67 @@
-const mongoose= require("mongoose");
-const {Schema} = mongoose;
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
+const validator = require("validator");
 
-const userSchema= new Schema({
-    firstName:{
-        type:String,
-        required:true,
-        minLength:4,
-        maxLength:50,
+const userSchema = new Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+      minLength: 4,
+      maxLength: 50,
     },
-    lastName:{
-        type:String,
+    lastName: {
+      type: String,
     },
-    emailId:{
-        type:String,
-        required:true,
-        unique:true,
-        trim:true,
+    emailId: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error(`Invalid email Address:` + value);
+        }
+      },
     },
-    password:{
-        type:String,
-        required:true,
-        unique:true,
+    password: {
+      type: String,
+      required: true,
+      unique: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error(`please enter a Strong Password!`);
+        }
+      },
     },
-    age:{
-        type:Number,
-        min:18,
+    age: {
+      type: Number,
+      min: 18,
     },
-    gender:{
-        type:String,
-        enum:['male','female','other'],
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
     },
-    skills:{
-        type:[String]
+    skills: {
+      type: [String],
     },
-    about:{
-        type:String,
-        default:"this is a default about description of user"
+    about: {
+      type: String,
+      default: "this is a default about description of user",
     },
-    photoUrl:{
-        type:String,
-        default:"https://res.cloudinary.com/jerrick/image/upload/d_642250b563292b35f27461a7.png,f_jpg,q_auto,w_720/67344c856c473c001d68c10d.png"
-    }
-}, { timestamps: true});
+    photoUrl: {
+      type: String,
+      default:
+        "https://res.cloudinary.com/jerrick/image/upload/d_642250b563292b35f27461a7.png,f_jpg,q_auto,w_720/67344c856c473c001d68c10d.png",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error(`Invalid photoUrl:` + value);
+        }
+      },
+    },
+  },
+  { timestamps: true }
+);
 
-const User = mongoose.model("User",userSchema);
-module.exports= User;
+const User = mongoose.model("User", userSchema);
+module.exports = User;

@@ -48,19 +48,29 @@ app.delete("/delete", async (req, res) => {
 });
 
 // update a user using patch
-app.patch("/user", async (req, res) => {
-  const userId = req.body?.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const newData = req.body;
+
   try {
+    // lets perform API level validation like ony certain fields can be update
+    const ALLOWED_UPDATES = ["photoUrl", "about", "age", "gender", "skills"];
+    const isUpdateAllowed = Object.keys(newData).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error(`Updates not allowed`);
+    }
+
     //here 3rd param is optional just to examine
     const user = await User.findByIdAndUpdate(userId, newData, {
       returnDocument: "before",
       runValidators: true,
     });
-    console.log(user); //before update data on console
+    // console.log(user); //before update data on console
     res.send(`Data Updated Succesfully`);
   } catch (error) {
-    res.status(400).send(`Something went wrong`);
+    res.status(400).send(`Update Failed:` + error.message);
   }
 });
 
