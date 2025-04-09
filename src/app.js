@@ -55,6 +55,7 @@ app.patch("/user", async (req, res) => {
     //here 3rd param is optional just to examine
     const user = await User.findByIdAndUpdate(userId, newData, {
       returnDocument: "before",
+      runValidators: true,
     });
     console.log(user); //before update data on console
     res.send(`Data Updated Succesfully`);
