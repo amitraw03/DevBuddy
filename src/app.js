@@ -46,15 +46,12 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error(`User not exist!!`);
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);
     if (!isPasswordValid) {
       throw new Error(`You have entered the wrong password`);
     } else {
       //generate a token
-      const token = await jwt.sign({ _id: user._id }, "RAW@WOLF123", {
-        expiresIn: "1h",
-      });
-
+      const token = await user.getJWT();
       // attach to a cookie and response back to user
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000),
