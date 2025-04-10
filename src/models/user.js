@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const {jwt} = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
@@ -79,5 +79,5 @@ userSchema.methods.validatePassword = async function (passsword){
     return isPasswordValid;
 }
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 module.exports = User;
