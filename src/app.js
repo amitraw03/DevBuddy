@@ -11,11 +11,13 @@ app.use(cookieParser()); // to read the cookie from req
 const authRouter = require("./routes/auth.js");
 const profileRouter= require("./routes/profile.js");
 const requestRouter = require("./routes/requests.js");
+const userRouter = require("./routes/user.js");
 
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
+app.use("/",userRouter);
 
 // /feed api using get API Call -->to display all the users
 app.get("/feed", userAuth, async (req, res) => {

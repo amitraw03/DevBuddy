@@ -54,7 +54,7 @@ requestRouter.post(
 
       res.json({
         message: `Request Sent successfully!!`,
-        info,
+        data:info,
       });
     } catch (error) {
       res.status(400).send(`ERROR: ` + error.message);
@@ -93,7 +93,7 @@ requestRouter.post(
 
       res.json({
         message: `Request Sent successfully!!`,
-        info,
+        data :info,
       });
     } catch (error) {
       res.status(400).send(`ERROR: ` + error.message);
