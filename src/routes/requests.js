@@ -4,6 +4,7 @@ const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
 const requestRouter = express.Router();
 
+// if interested-->approach
 requestRouter.post(
   "/request/send/:status/:toUserId",
   userAuth,
@@ -17,12 +18,12 @@ requestRouter.post(
 
       //(1) to validate and make sure fromUserId!=toUserID using Schema Validation using 'pre'
 
-    //(2) to validate status can't be randomed
+      //(2) to validate status can't be randomed
       const allowedStatus = ["interested", "ignored"];
       if (!allowedStatus.includes(status)) {
         return res
           .status(400)
-          .json({ message: `this` + status + `not allowed!!` });
+          .json({ message: `this status:` + status + `not allowed!!` });
       }
 
       //(3) to validate the target user is actually exist in D.B or not
@@ -50,6 +51,45 @@ requestRouter.post(
         status,
       });
       const info = await connectionRequest.save();
+
+      res.json({
+        message: `Request Sent successfully!!`,
+        info,
+      });
+    } catch (error) {
+      res.status(400).send(`ERROR: ` + error.message);
+    }
+  }
+);
+
+// Response
+requestRouter.post(
+  "/request/send/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req?.user;
+      const { status, requestId } = req.params; //requestId is the collection Id of connecReq
+
+      //validate status & connectReq existence
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: `this status:` + status + `not allowed!!` });
+      }
+
+      const existingConnectionRequest = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedInUser._id,
+        status: "interested",
+      });
+      if (!existingConnectionRequest) {
+        return res.status(404).send(`Connection request doesn't exist!!`);
+      }
+
+      existingConnectionRequest.status = status;
+      const info = await existingConnectionRequest.save();
 
       res.json({
         message: `Request Sent successfully!!`,

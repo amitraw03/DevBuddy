@@ -25,6 +25,9 @@ const connectionRequestSchema = new Schema(
     }
 );
 
+//to makke DB query much efficient by storing such keywords as indexes in D.B
+connectionRequestSchema.index({fromUserId:1, toUserId:1});
+
 connectionRequestSchema.pre("save",function (next) {
     const connectionRequest = this;
     // fromUserId != toUserId
