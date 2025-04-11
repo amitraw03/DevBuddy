@@ -9,11 +9,13 @@ app.use(express.json()); // express middleware to parse json data in server comi
 app.use(cookieParser()); // to read the cookie from req
 
 const authRouter = require("./routes/auth.js");
-const profileRouter= require("./routes/profile.js")
+const profileRouter= require("./routes/profile.js");
+const requestRouter = require("./routes/requests.js");
 
 
 app.use("/",authRouter);
 app.use("/",profileRouter);
+app.use("/",requestRouter);
 
 // /feed api using get API Call -->to display all the users
 app.get("/feed", userAuth, async (req, res) => {

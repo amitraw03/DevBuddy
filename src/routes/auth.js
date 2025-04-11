@@ -2,6 +2,7 @@ const express = require("express");
 const authRouter = express.Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const { userAuth } = require("../middlewares/auth");
 
 authRouter.post("/signup", async (req, res) => {
   const { firstName, lastName, emailId, password } = req?.body;
@@ -29,6 +30,8 @@ authRouter.post("/signup", async (req, res) => {
 });
 
 authRouter.post("/login", async (req, res) => {
+  // console.log("Request Body:", req.body); 
+
   const { emailId, password } = req.body;
 
   try {
@@ -61,7 +64,7 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-authRouter.post("/logout", async (req, res) => {
+authRouter.post("/logout",userAuth, async (req, res) => {
   try {
     res.clearCookie("token", {
       httpOnly: true,
