@@ -1,12 +1,11 @@
 
-
 function App() {
 
   return (
     <>
-      <h1>Hello World</h1>
+      <h1 className="bg-amber-800">Vite + React</h1>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
