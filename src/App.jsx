@@ -16,7 +16,7 @@ function App() {
           </Routes>
         </BrowserRouter>
 
-      <h1 className="bg-amber-800">Vite + React</h1>
+      {/* <h1 className="bg-amber-800">Vite + React</h1> */}
     </>
   );
 }
