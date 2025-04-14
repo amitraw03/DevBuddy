@@ -8,6 +8,7 @@ import { BASE_URL } from "../utils/constants";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error,setError]= useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -28,6 +29,7 @@ const Login = () => {
       return navigate("/");
       
     } catch (error) {
+      setError(error?.response?.data || `Something Went Wrong`)
       console.error("Error in Login Handler", error);
     }
   };
@@ -57,6 +59,7 @@ const Login = () => {
             <div className="form-control mt-4">
               <label className="label" htmlFor="password">
                 <span className="label-text">Password</span>
+                
               </label>
               <input
                 id="password"
@@ -67,6 +70,7 @@ const Login = () => {
                 value={password} // Controlled input
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <p className="text-red-500">{error}</p>
             </div>
             <div className="form-control mt-6">
               <button

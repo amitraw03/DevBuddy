@@ -21,7 +21,7 @@ const Body = () => {
       dispatch(addUser(res.data));
     } catch (error) {
       if(error.status === 401){  // if token expired or loggedOut
-         navigate("/login");
+        return navigate("/login");
       }
       console.log(error);
     }
