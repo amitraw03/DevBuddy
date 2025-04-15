@@ -37,14 +37,22 @@ const Navbar = () => {
 
         {user && (
           <>
-            {/* Connections Button - Middle Section */}
-            <div className="flex justify-center flex-1">
+            {/* Navigation Buttons - Middle Section */}
+            <div className="flex justify-center flex-1 gap-2">
               <Link 
                 to="/connections" 
                 className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
               >
                 <span className="hidden sm:inline">Connections</span>
                 <div className="badge badge-sm badge-primary ml-1">👤</div>
+              </Link>
+              
+              <Link 
+                to="/requests" 
+                className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
+              >
+                <span className="hidden sm:inline">Requests</span>
+                <div className="badge badge-sm badge-primary ml-1">✉️</div>
               </Link>
             </div>
 
