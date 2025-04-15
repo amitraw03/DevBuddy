@@ -13,14 +13,16 @@ const Body = () => {
   const navigate = useNavigate();
 
   const fetchUser = async () => {
-    if(userData) return; // if already data in redux store , no need for API calling
+    if(userData) return;
     try {
       const res = await axios.get(BASE_URL + "/profile/view", {
         withCredentials: true,
       });
-      dispatch(addUser(res.data));
+      // console.log(res?.data);
+      
+      dispatch(addUser(res?.data));
     } catch (error) {
-      if(error.status === 401){  // if token expired or loggedOut
+      if(error?.status === 401){  // if token expired or loggedOut
         return navigate("/login");
       }
       console.log(error);
@@ -28,8 +30,8 @@ const Body = () => {
   };
 
   useEffect(()=>{
-    fetchUser();
-  },[])
+      fetchUser();  
+  },[userData, dispatch, navigate])
 
   return (
     <div className="flex flex-col min-h-screen">
