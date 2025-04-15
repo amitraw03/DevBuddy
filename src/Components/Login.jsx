@@ -35,10 +35,10 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="card w-96 bg-info-content shadow-xl">
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <div className="card w-full max-w-xs sm:max-w-sm md:max-w-md bg-info-content shadow-xl">
         <div className="card-body">
-          <h2 className="card-title justify-center text-2xl font-bold">
+          <h2 className="card-title justify-center text-xl sm:text-2xl font-bold">
             Login
           </h2>
           <form onSubmit={handleLogin}>
@@ -50,7 +50,7 @@ const Login = () => {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="input input-bordered bg-white text-black"
+                className="input input-bordered bg-white text-black w-full"
                 required
                 value={email} // Controlled input
                 onChange={(e) => setEmail(e.target.value)}
@@ -65,17 +65,17 @@ const Login = () => {
                 id="password"
                 type="password"
                 placeholder="Enter your password"
-                className="input input-bordered bg-white text-black"
+                className="input input-bordered bg-white text-black w-full"
                 required
                 value={password} // Controlled input
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="text-red-500">{error}</p>
+              <p className="text-red-500 text-sm mt-1">{error}</p>
             </div>
             <div className="form-control mt-6">
               <button
                 type="submit"
-                className="btn btn-accent-content rounded-lg"
+                className="btn btn-accent-content rounded-lg w-full"
               >
                 Login
               </button>
