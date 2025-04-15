@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
@@ -7,7 +7,6 @@ import { removeUser } from "../utils/userSlice";
 
 const Navbar = () => {
   const user = useSelector((store) => store?.user || null);
-  // console.log(user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,6 +28,7 @@ const Navbar = () => {
   return (
     <div>
       <div className="navbar bg-info-content shadow-sm">
+        {/* Logo - Left Side */}
         <div className="flex-1">
           <Link to="/" className="btn btn-ghost text-xl">
             DevBuddy
@@ -37,45 +37,70 @@ const Navbar = () => {
 
         {user && (
           <>
-            {/* Desktop view */}
-            <div className="hidden md:flex md:gap-2">
-              <div className="my-auto -mr-4"> Welcome💗, {user?.firstName}</div>
-              <div className="dropdown dropdown-end mx-8">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost btn-circle avatar"
-                >
-                  <div className="w-10 rounded-full">
-                    <img alt="profile-user" src={user.photoUrl} />
-                  </div>
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
-                >
-                  <li>
-                    <Link to="/profile" className="justify-between">
-                      Profile
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to="/connections">Connections</Link>
-                  </li>
-                  <li>
-                    <Link onClick={handleLogout}>Logout</Link>
-                  </li>
-                </ul>
-              </div>
+            {/* Connections Button - Middle Section */}
+            <div className="flex justify-center flex-1">
+              <Link 
+                to="/connections" 
+                className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
+              >
+                <span className="hidden sm:inline">Connections</span>
+                <div className="badge badge-sm badge-primary ml-1">👤</div>
+              </Link>
             </div>
 
-            {/* Mobile view - hamburger menu */}
-            <div className="md:hidden">
-              <button onClick={toggleMobileMenu} className="btn btn-ghost btn-circle">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
+            {/* Profile Section - Right Side */}
+            <div className="flex-1 flex justify-end">
+              {/* Desktop view */}
+              <div className="hidden md:flex md:items-center md:gap-2">
+                <div className="my-auto mr-2">Welcome💗, {user?.firstName}</div>
+                <div className="dropdown dropdown-end">
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn btn-ghost btn-circle avatar"
+                  >
+                    <div className="w-10 rounded-full">
+                      <img alt="profile-user" src={user.photoUrl} />
+                    </div>
+                  </div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content bg-base-100 rounded-box z-10 mt-3 w-52 p-2 shadow"
+                  >
+                    <li>
+                      <Link to="/profile" className="justify-between">
+                        Profile
+                      </Link>
+                    </li>
+                    <li>
+                      <Link onClick={handleLogout}>Logout</Link>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Mobile view - hamburger menu */}
+              <div className="md:hidden">
+                <button
+                  onClick={toggleMobileMenu}
+                  className="btn btn-ghost btn-circle"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
           </>
         )}
@@ -87,7 +112,11 @@ const Navbar = () => {
           <div className="text-center mb-2">Welcome💗, {user?.firstName}</div>
           <div className="flex justify-center mb-4">
             <div className="w-12 h-12 rounded-full overflow-hidden">
-              <img alt="profile-user" src={user.photoUrl} className="w-full h-full object-cover" />
+              <img
+                alt="profile-user"
+                src={user.photoUrl}
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
           <ul className="menu menu-sm w-full">
@@ -95,9 +124,6 @@ const Navbar = () => {
               <Link to="/profile" className="justify-between">
                 Profile
               </Link>
-            </li>
-            <li className="text-center">
-              <Link to='/connections'>Connections </Link>
             </li>
             <li className="text-center">
               <Link onClick={handleLogout}>Logout</Link>
