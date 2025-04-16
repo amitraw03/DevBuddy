@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { removeUserFromFeed } from '../utils/feedSlice';
+import { BASE_URL } from '../utils/constants';
 
 const UserCard = ({ user }) => {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+
+  // If no user data, simply return null (preserving the original behavior)
   if (!user) return null;
-  
-  const { firstName, lastName, age, gender, photoUrl, about, skills } = user;
+
+  const { _id, firstName, lastName, age, gender, photoUrl, about, skills } = user;
   const skillsString = Array.isArray(skills) ? skills.join(", ") : skills;
+
+  // Handle sending request (interested or ignore)
+  const handleSendRequest = async (userId, status) => {
+    setIsLoading(true);
+    try {
+      await axios.post(`${BASE_URL}/request/send/${status}/${userId}`, {}, {
+        withCredentials: true,
+      });
+
+      // Remove user from feed after sending request
+      dispatch(removeUserFromFeed(userId));
+    } catch (error) {
+      console.error(`Error sending ${status} request:`, error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="card bg-inherit w-full max-w-sm shadow-lg border border-gray-700 rounded-3xl overflow-hidden relative">
@@ -39,10 +64,18 @@ const UserCard = ({ user }) => {
         </p>
         <p className="text-xs sm:text-sm italic">{skillsString}</p>
         <div className="card-actions mt-3 sm:mt-4 flex flex-col sm:flex-row gap-2 w-full">
-          <button className="btn btn-error text-white shadow-md hover:bg-gray-600 w-full sm:flex-1 transition-all duration-300">
+          <button 
+            className="btn btn-error text-white shadow-md hover:bg-gray-600 w-full sm:flex-1 transition-all duration-300"
+            onClick={() => handleSendRequest(_id, 'ignored')}
+            disabled={isLoading}
+          >
             Ignore 💔
           </button>
-          <button className="btn btn-success text-white shadow-md hover:bg-teal-600 w-full sm:flex-1 transition-all duration-300">
+          <button 
+            className="btn btn-success text-white shadow-md hover:bg-teal-600 w-full sm:flex-1 transition-all duration-300"
+            onClick={() => handleSendRequest(_id, 'interested')}
+            disabled={isLoading}
+          >
             Interested ✅
           </button>
         </div>

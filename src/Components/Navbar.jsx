@@ -35,29 +35,31 @@ const Navbar = () => {
           </Link>
         </div>
 
+        {/* Middle Section - Only for logged-in users */}
         {user && (
-          <>
-            {/* Navigation Buttons - Middle Section */}
-            <div className="flex justify-center flex-1 gap-2">
-              <Link 
-                to="/connections" 
-                className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
-              >
-                <span className="hidden sm:inline">Connections</span>
-                <div className="badge badge-sm badge-primary ml-1">👤</div>
-              </Link>
-              
-              <Link 
-                to="/requests" 
-                className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
-              >
-                <span className="hidden sm:inline">Requests</span>
-                <div className="badge badge-sm badge-primary ml-1">✉️</div>
-              </Link>
-            </div>
+          <div className="flex justify-center flex-1 gap-2">
+            <Link 
+              to="/connections" 
+              className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
+            >
+              <span className="hidden sm:inline">Connections</span>
+              <div className="badge badge-sm badge-primary ml-1">👤</div>
+            </Link>
+            
+            <Link 
+              to="/requests" 
+              className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
+            >
+              <span className="hidden sm:inline">Requests</span>
+              <div className="badge badge-sm badge-primary ml-1">✉️</div>
+            </Link>
+          </div>
+        )}
 
-            {/* Profile Section - Right Side */}
-            <div className="flex-1 flex justify-end">
+        {/* Right Section - Always present */}
+        <div className="flex-1 flex justify-end">
+          {user ? (
+            <>
               {/* Desktop view */}
               <div className="hidden md:flex md:items-center md:gap-2">
                 <div className="my-auto mr-2">Welcome💗, {user?.firstName}</div>
@@ -109,9 +111,14 @@ const Navbar = () => {
                   </svg>
                 </button>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          ) : (
+            // Login Button for both desktop and mobile
+            <Link to="/login" className="btn btn-ghost">
+              Login
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Mobile menu dropdown */}

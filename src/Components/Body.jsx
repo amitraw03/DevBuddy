@@ -1,37 +1,46 @@
+// Body.jsx
 import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import axios from "axios";
 
 const Body = () => {
-  const userData = useSelector((store)=>store.user);
+  const userData = useSelector((store) => store.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchUser = async () => {
-    if(userData) return;
+    // Only fetch user data if it hasn't already been set
+    if (userData) return;
     try {
-      const res = await axios.get(BASE_URL + "/profile/view", {
+      const res = await axios.get(`${BASE_URL}/profile/view`, {
         withCredentials: true,
       });
-      // console.log(res?.data);
-      
-      dispatch(addUser(res?.data));
+      dispatch(addUser(res.data));
     } catch (error) {
-      if(error?.status === 401){  // if token expired or loggedOut
-        return navigate("/login");
+      // List of protected paths for which we want to force a login on 401
+      const protectedPaths = ["/profile", "/connections", "/requests"];
+      if (
+        error.response &&
+        error.response.status === 401 &&
+        protectedPaths.includes(location.pathname)
+      ) {
+        // If on a protected route, redirect to login
+        navigate("/login");
       }
-      console.log(error);
+      // Otherwise, log the error and leave userData as null
+      console.error("Profile fetch error:", error);
     }
   };
 
-  useEffect(()=>{
-      fetchUser();  
-  },[userData, dispatch, navigate])
+  useEffect(() => {
+    fetchUser();
+  }, [userData, dispatch, navigate, location.pathname]);
 
   return (
     <div className="flex flex-col min-h-screen">
