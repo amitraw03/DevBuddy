@@ -31,7 +31,7 @@ const Navbar = () => {
         {/* Logo - Left Side */}
         <div className="flex-1">
           <Link to="/" className="btn btn-ghost text-xl">
-            DevBuddy
+            DevBuddy 
           </Link>
         </div>
 
@@ -79,7 +79,7 @@ const Navbar = () => {
                   >
                     <li>
                       <Link to="/profile" className="justify-between">
-                        Profile
+                        Profile 
                       </Link>
                     </li>
                     <li>
