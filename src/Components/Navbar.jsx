@@ -30,24 +30,27 @@ const Navbar = () => {
       <div className="navbar bg-info-content shadow-sm">
         {/* Logo - Left Side */}
         <div className="flex-1">
-          <Link to="/" className="btn btn-ghost text-xl">
-            DevBuddy 
+          <Link
+            to="/"
+            className="btn btn-ghost text-xl italic hover:bg-transparent active:bg-transparent focus:bg-transparent"
+          >
+            DevBuddy
           </Link>
         </div>
 
         {/* Middle Section - Only for logged-in users */}
         {user && (
           <div className="flex justify-center flex-1 gap-2">
-            <Link 
-              to="/connections" 
+            <Link
+              to="/connections"
               className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
             >
               <span className="hidden sm:inline">Connections</span>
               <div className="badge badge-sm badge-primary ml-1">👤</div>
             </Link>
-            
-            <Link 
-              to="/requests" 
+
+            <Link
+              to="/requests"
               className="btn btn-neutral btn-sm rounded-2xl sm:btn-md"
             >
               <span className="hidden sm:inline">Requests</span>
@@ -79,7 +82,7 @@ const Navbar = () => {
                   >
                     <li>
                       <Link to="/profile" className="justify-between">
-                        Profile 
+                        Profile
                       </Link>
                     </li>
                     <li>
