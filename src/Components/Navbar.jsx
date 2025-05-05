@@ -15,9 +15,13 @@ const Navbar = () => {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
       dispatch(removeUser());
-      return navigate("/login");
+      window.location.href = "/login";
     } catch (error) {
-      console.log(error);
+      console.error("Logout error:", error);
+      // Even if API call fails, clear state and redirect
+      dispatch(removeUser());
+      window.location.href = "/login";
+  
     }
   };
 

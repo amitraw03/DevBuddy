@@ -1,4 +1,3 @@
-// Body.jsx
 import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -15,8 +14,6 @@ const Body = () => {
   const location = useLocation();
 
   const fetchUser = async () => {
-    // Only fetch user data if it hasn't already been set
-    if (userData) return;
     try {
       const res = await axios.get(`${BASE_URL}/profile/view`, {
         withCredentials: true,
@@ -40,7 +37,7 @@ const Body = () => {
 
   useEffect(() => {
     fetchUser();
-  }, [userData, dispatch, navigate, location.pathname]);
+  }, [location.pathname]);
 
   return (
     <div className="flex flex-col min-h-screen">
