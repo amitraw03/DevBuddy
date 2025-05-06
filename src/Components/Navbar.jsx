@@ -21,7 +21,6 @@ const Navbar = () => {
       // Even if API call fails, clear state and redirect
       dispatch(removeUser());
       window.location.href = "/login";
-  
     }
   };
 
@@ -150,6 +149,11 @@ const Navbar = () => {
             <li className="text-center">
               <Link to="/profile" className="justify-between">
                 Profile
+              </Link>
+            </li>
+            <li className="text-center">
+              <Link to="/premium" className="justify-between">
+                Premium
               </Link>
             </li>
             <li className="text-center">
