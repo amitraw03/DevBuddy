@@ -9,6 +9,7 @@ import LoginSignup from "./Components/LoginSignup";
 import PrivateRoute from "./Components/PrivateRoute";
 import { Provider } from "react-redux";
 import appStore from "./utils/appStore";
+import Premium from "./Components/Premium";
 
 function App() {
   return (
@@ -21,31 +22,39 @@ function App() {
             <Route path="/" element={<Feed />} />
             {/* Public LoginSignup route */}
             <Route path="/login" element={<LoginSignup />} />
-            
+
             {/* Protected Routes */}
-            <Route 
-              path="/profile" 
+            <Route
+              path="/profile"
               element={
                 <PrivateRoute>
                   <Profile />
                 </PrivateRoute>
-              } 
+              }
             />
-            <Route 
-              path="/connections" 
+            <Route
+              path="/connections"
               element={
                 <PrivateRoute>
                   <Connections />
                 </PrivateRoute>
-              } 
+              }
             />
-            <Route 
-              path="/requests" 
+            <Route
+              path="/requests"
               element={
                 <PrivateRoute>
                   <Requests />
                 </PrivateRoute>
-              } 
+              }
+            />
+            <Route
+              path="/premium"
+              element={
+                <PrivateRoute>
+                  <Premium />
+                </PrivateRoute>
+              }
             />
           </Route>
         </Routes>
