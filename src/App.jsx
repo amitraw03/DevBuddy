@@ -10,6 +10,7 @@ import PrivateRoute from "./Components/PrivateRoute";
 import { Provider } from "react-redux";
 import appStore from "./utils/appStore";
 import Premium from "./Components/Premium";
+import Chats from "./Components/Chats";
 
 function App() {
   return (
@@ -53,6 +54,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Premium />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/chat/:targetId"
+              element={
+                <PrivateRoute>
+                  <Chats/>
                 </PrivateRoute>
               }
             />
