@@ -1,51 +1,81 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { IoSend, IoArrowBack } from "react-icons/io5";
 import { createSocketConnection } from "../utils/socket";
+import { BASE_URL } from "../utils/constants";
 
 const Chats = () => {
   const { targetId } = useParams(); // to extract targetId from path
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user);
   const currId = currentUser?._id;
-  const [messages, setMessages] = useState([]);  // this state var to display ongoing messages
+  const [messages, setMessages] = useState([]);  // display ongoing messages
   const [newMessage, setNewMessage] = useState("");
-  const connections = useSelector((state) => state.connection || []);
+  const connections = useSelector((state) => state.connection ?? []);
+  const socketRef = useRef(null);
 
+  // 1) Fetch chat history
   useEffect(() => {
-    const socket = createSocketConnection(); // create connection once the page loads & emit the joinChat event
-    socket.emit("joinChat", { currId, targetId });
-    
-    // handling the incoming msgs & display it on screen
-    socket.on("messageReceived", ({ senderId, text, timestamp }) => {
-      if (senderId === currId) return; // Ignore our own messages
-      setMessages(prev => [...prev, { senderId, text, timestamp }]);
+    const fetchChatMessages = async () => {
+      try {
+        const res = await axios.get(
+          `${BASE_URL}/chat/${targetId}`,
+          { withCredentials: true }
+        );
+
+        const initial = res?.data?.messages?.map((msg) => ({
+          senderId: msg?.senderId?._id ?? msg?.senderId,
+          text: msg?.text,
+          // use mongoose auto-timestamp
+          timestamp: msg?.createdAt,
+        }));
+
+        setMessages(initial ?? []);
+      } catch (err) {
+        console.error("Failed to fetch chat history:", err);
+      }
+    };
+
+    fetchChatMessages();
+  }, [targetId]);
+
+  // 2) Real-time sockets
+  useEffect(() => {
+    socketRef.current = createSocketConnection();
+    socketRef.current.emit("joinChat", { currId, targetId });
+
+    socketRef.current.on("messageReceived", ({ senderId, text, createdAt }) => {
+      if (senderId === currId) return; // ignore our own echoes
+      setMessages((prev) => [
+        ...prev,
+        { senderId, text, timestamp: createdAt },
+      ]);
     });
 
-    return () => socket.disconnect();  //remove connection
+    return () => {
+      socketRef.current?.disconnect();
+    };
   }, [currId, targetId]);
-  
-  // Functn to append the input tag msges with ongoing msges
+
+  // Send new message
   const sendMessage = () => {
     if (!newMessage.trim()) return;
-
-    const socket = createSocketConnection();
     const timestamp = new Date();
-    
-    // // handling the sending msgs & display it on screen
-    setMessages(prev => [...prev, {
-      senderId: currId,
-      text: newMessage,
-      timestamp
-    }]);
-    
-    //emit the sendMessage event
-    socket.emit("sendMessage", {
+
+    // Optimistic render
+    setMessages((prev) => [
+      ...prev,
+      { senderId: currId, text: newMessage, timestamp },
+    ]);
+
+    socketRef.current?.emit("sendMessage", {
       currId,
       targetId,
       text: newMessage,
     });
+
     setNewMessage("");
   };
 
@@ -58,9 +88,7 @@ const Chats = () => {
     };
   }, []);
 
-
-
-  //find targetUser info from all connections
+  // Identify target user
   const targetUser = connections.find(
     (conn) => conn?._id?.toString() === targetId?.toString()
   );
@@ -68,7 +96,7 @@ const Chats = () => {
   if (!connections.length) {
     return (
       <div className="flex items-center justify-center h-screen bg-base-200">
-        <span className="loading loading-spinner text-primary"></span>
+        <span className="loading loading-spinner text-primary" />
       </div>
     );
   }
@@ -77,7 +105,9 @@ const Chats = () => {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-base-200 p-4">
         <div className="max-w-md w-full bg-base-100 rounded-box p-6 shadow-lg">
-          <h1 className="text-2xl font-bold text-error mb-4">User Not Found</h1>
+          <h1 className="text-2xl font-bold text-error mb-4">
+            User Not Found
+          </h1>
           <button
             onClick={() => navigate("/connections")}
             className="btn btn-primary w-full"
@@ -103,33 +133,31 @@ const Chats = () => {
           <div className="avatar">
             <div className="w-10 rounded-full">
               <img
-                src={targetUser?.photoUrl || "/default-avatar.png"}
-                alt={targetUser.firstName}
+                src={targetUser?.photoUrl ?? "/default-avatar.png"}
+                alt={targetUser?.firstName}
               />
             </div>
           </div>
           <div>
             <h2 className="font-semibold text-lg">
-              {targetUser.firstName} {targetUser.lastName}
+              {targetUser?.firstName} {targetUser?.lastName}
             </h2>
             <p className="text-xs text-gray-500">Online</p>
           </div>
         </div>
       </div>
 
-     {/* Messages Container */}
-     <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {messages.map((msg, index) => {
-          //making details dynamic on basis of isSent
-          const isSent = msg.senderId === currId;  
-          const userPhoto = isSent 
-            ? currentUser?.photoUrl 
-            : targetUser?.photoUrl || "/default-avatar.png";
+      {/* Messages Container */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+        {messages.map((msg, i) => {
+          const isSent = msg.senderId === currId;
+          const userPhoto = isSent
+            ? currentUser?.photoUrl
+            : targetUser?.photoUrl ?? "/default-avatar.png";
           const displayName = isSent ? "You" : targetUser?.firstName;
 
           return (
-            //isSent --> true ? right side : left side
-            <div key={index} className={`chat ${isSent ? 'chat-end' : 'chat-start'}`}>
+            <div key={i} className={`chat ${isSent ? "chat-end" : "chat-start"}`}>
               <div className="chat-image avatar">
                 <div className="w-10 rounded-full">
                   <img src={userPhoto} alt={displayName} />
@@ -138,17 +166,21 @@ const Chats = () => {
               <div className="chat-header">
                 {displayName}
                 <time className="text-xs opacity-50 ml-2">
-                  {new Date(msg.timestamp).toLocaleTimeString([], { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
+                  {new Date(msg.timestamp).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </time>
               </div>
-              <div className={`chat-bubble ${isSent ? 'bg-primary text-primary-content' : 'bg-base-100'}`}>
+              <div
+                className={`chat-bubble ${
+                  isSent ? "bg-primary text-primary-content" : "bg-base-100"
+                }`}
+              >
                 {msg.text}
               </div>
               <div className="chat-footer opacity-50">
-                {isSent ? 'Delivered' : 'Seen'}
+                {isSent ? "Delivered" : "Seen"}
               </div>
             </div>
           );
@@ -161,7 +193,7 @@ const Chats = () => {
           <input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+            onKeyPress={(e) => e.key === "Enter" && sendMessage()}
             type="text"
             placeholder="Type a message..."
             className="input input-bordered w-full bg-base-200 focus:outline-none"
