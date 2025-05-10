@@ -8,66 +8,69 @@ import Requests from "./Components/Requests";
 import LoginSignup from "./Components/LoginSignup";
 import PrivateRoute from "./Components/PrivateRoute";
 import { Provider } from "react-redux";
-import appStore from "./utils/appStore";
+import { PersistGate } from "redux-persist/integration/react";
+import appStore, { persistor } from "./utils/appStore";
 import Premium from "./Components/Premium";
 import Chats from "./Components/Chats";
 
 function App() {
   return (
     <Provider store={appStore}>
-      <BrowserRouter basename="/">
-        <Routes>
-          {/* Body is a parent route with child routes rendered via <Outlet> */}
-          <Route path="/" element={<Body />}>
-            {/* Public Home Feed route */}
-            <Route path="/" element={<Feed />} />
-            {/* Public LoginSignup route */}
-            <Route path="/login" element={<LoginSignup />} />
+      <PersistGate loading={null} persistor={persistor}>
+        <BrowserRouter basename="/">
+          <Routes>
+            {/* Body is a parent route with child routes rendered via <Outlet> */}
+            <Route path="/" element={<Body />}>
+              {/* Public Home Feed route */}
+              <Route path="/" element={<Feed />} />
+              {/* Public LoginSignup route */}
+              <Route path="/login" element={<LoginSignup />} />
 
-            {/* Protected Routes */}
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/connections"
-              element={
-                <PrivateRoute>
-                  <Connections />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/requests"
-              element={
-                <PrivateRoute>
-                  <Requests />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/premium"
-              element={
-                <PrivateRoute>
-                  <Premium />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/chat/:targetId"
-              element={
-                <PrivateRoute>
-                  <Chats/>
-                </PrivateRoute>
-              }
-            />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+              {/* Protected Routes */}
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/connections"
+                element={
+                  <PrivateRoute>
+                    <Connections />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/requests"
+                element={
+                  <PrivateRoute>
+                    <Requests />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/premium"
+                element={
+                  <PrivateRoute>
+                    <Premium />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/chat/:targetId"
+                element={
+                  <PrivateRoute>
+                    <Chats />
+                  </PrivateRoute>
+                }
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </PersistGate>
     </Provider>
   );
 }
