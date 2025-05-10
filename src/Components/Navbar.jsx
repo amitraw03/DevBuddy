@@ -1,20 +1,22 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { removeUser } from "../utils/userSlice";
+import { persistor } from "../utils/appStore";
 
 const Navbar = () => {
   const user = useSelector((store) => store?.user || null);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
       dispatch(removeUser());
+      // clear out the persisted store
+      persistor.purge();
       window.location.href = "/login";
     } catch (error) {
       console.error("Logout error:", error);
