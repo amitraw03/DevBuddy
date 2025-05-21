@@ -28,7 +28,6 @@ const Feed = () => {
     getFeed();
   }, []);
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
@@ -38,16 +37,36 @@ const Feed = () => {
   }
 
   return (
-    <div className="flex justify-center mt-4 sm:mt-6 md:mt-10 px-4">
-      {feedData && feedData.length > 0 ? (
-        <UserCard user={feedData[0]} />
-      ) : (
-        <div className="text-center py-16 sm:py-20 bg-base-200 rounded-3xl w-full max-w-md">
-          <div className="text-5xl mb-4">🔍</div>
-          <h2 className="text-xl sm:text-2xl text-gray-500">No more profiles</h2>
-          <p className="text-gray-400 mt-2">Check back later for more connections</p>
+    <div
+      className={`
+        flex justify-center items-center min-h-screen px-4
+        md:items-start md:justify-center md:min-h-0 md:mt-10
+      `}
+    >
+      {/* Fixed-width wrapper to center content nicely */}
+      <div className="w-full max-w-md">
+        {/* Mobile-only animated sub-heading */}
+        <div className="block md:hidden text-center mb-4">
+          <h3 className="text-2xl font-semibold font-mono animate-bounce">
+            Explore the Devs
+          </h3>
         </div>
-      )}
+
+        {/* Card or fallback message */}
+        {feedData && feedData.length > 0 ? (
+          <UserCard user={feedData[0]} />
+        ) : (
+          <div className="text-center py-16 sm:py-20 bg-base-200 rounded-3xl">
+            <div className="text-5xl mb-4">🔍</div>
+            <h2 className="text-xl sm:text-2xl text-gray-500">
+              No more profiles
+            </h2>
+            <p className="text-gray-400 mt-2">
+              Check back later for more connections
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
